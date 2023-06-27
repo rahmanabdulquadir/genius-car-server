@@ -28,6 +28,7 @@ async function run() {
       res.send(services);
     });
 
+    // get single selected service product by this api
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -35,8 +36,9 @@ async function run() {
       res.send(service);
     });
 
-    // orders api
+    // all the orders related api from ordersCollection db
 
+    // get all the orders from an user from this api through query (?email=example@gamil.com)
     app.get("/orders", async (req, res) => {
       let query = {};
       if (req.query.email) {
@@ -49,37 +51,40 @@ async function run() {
       res.send(orders);
     });
 
+    // make orders from frontend and save it in database by this api
     app.post("/orders", async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
       res.send(result);
     });
 
-    app.patch('/orders/:id', async(req, res) => {
-      const id = req.params.id
+    // api for updating doc
+    app.patch('/orders/:id', async (req, res) => {
+      const id = req.params.id;
       const status = req.body.status;
-      const query = {_id: new ObjectId(id)}
-      const updatedDoc = {
-        $set:{
-          status: status
-        }
+      const query = {
+          _id: new ObjectId(id)
+      };
+      const updateDoc = {
+          $set: {
+              status: status
+          }
       }
-      const result = await orderCollection.updateOne(query, updatedDoc)
-      res.send(result)
-    })
+      const result = await orderCollection.updateOne(query, updateDoc);
+      res.send(result);
+  })
 
-    app.delete('/orders/:id', async (req, res) => {
+    // api for deleting orders
+    app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
       res.send(result);
-  })
+    });
   } finally {
   }
 }
 run().catch((err) => console.log(err));
-
-console.log(uri);
 
 app.get("/", (req, res) => {
   res.send("genius car server is running");
